@@ -22,7 +22,6 @@ public class Agent {
 	private long time;
 
 	private Configurations configurations;
-	private boolean[][] workerStatus;
 	private Board board;
 	private int maxNumMoves;
 	private BoardEvaluator boardEvaluator;
@@ -47,43 +46,33 @@ public class Agent {
 		Board newBoard;
 		
 		// initialize work queue
-		if (!board.hasCursor()) {
-			this.workerStatus = new boolean[numRows][numCols];
-			int numCursorOrbsToTry = Configurations.getNumCursorOrbsToTry();
-			if (numCursorOrbsToTry == numRows * numCols) {
-				for (int r = 0; r < numRows; r++) {
-					for (int c = 0; c < numCols; c++) {
-						newBoard = new Board(board);
-						newBoard.setCursor(r, c);
-						data = new BoardData(newBoard, -1.0, new ArrayList<Move>());
-						queue.add(data);
-					}
-				}
-			} else {
-				for (int i = 0; i < numRows; i++) {
-					for (int j = 0; j < numCols; j++) {
-						workerStatus[i][j] = true;
-					}
-				}
-				List<Point> randomCoordinates = getRandomCoordinates(numCursorOrbsToTry);
-				for (Point p : randomCoordinates) {
-					workerStatus[p.x][p.y] = false;
+		int numCursorOrbsToTry = Configurations.getNumCursorOrbsToTry();
+		if (numCursorOrbsToTry == numRows * numCols) {
+			for (int r = 0; r < numRows; r++) {
+				for (int c = 0; c < numCols; c++) {
 					newBoard = new Board(board);
-					newBoard.setCursor(p.x, p.y);
+					newBoard.setCursor(r, c);
 					data = new BoardData(newBoard, -1.0, new ArrayList<Move>());
 					queue.add(data);
 				}
 			}
 		} else {
-			this.workerStatus = new boolean[1][1];
-			newBoard = new Board(board);
-			data = new BoardData(newBoard, -1.0, new ArrayList<Move>());
-			queue.add(data);
+			List<Point> randomCoordinates = getRandomCoordinates(numCursorOrbsToTry);
+			for (Point p : randomCoordinates) {
+				newBoard = new Board(board);
+				newBoard.setCursor(p.x, p.y);
+				data = new BoardData(newBoard, -1.0, new ArrayList<Move>());
+				queue.add(data);
+			}
 		}
 		
 		// kick off threads
+		for (int i = 0; i < Configurations.NUM_THREADS; i++) {
+			Thread worker = new Thread(new WorkConsumer(this));
+			worker.start();
+		}
 		
-		
+		// wait 5 seconds
 		try {
 			Thread.sleep(5 * 1000);
 		} catch (InterruptedException e) {
@@ -97,13 +86,20 @@ public class Agent {
 		this.board = MovesetExecutor.execute(board, bestBoardData.getMoveset());
 	}
 	
-	public static List<Move> appendMoveset(List<Move> moveset, Move newMove) {
-		List<Move> newMoveset = new ArrayList<Move>();
-		for (Move move : moveset) {
-			newMoveset.add(move);
-		}
-		newMoveset.add(newMove);
-		return newMoveset;
+	public synchronized BoardData poll() {
+		return queue.poll();
+	}
+	
+	public synchronized void addWork(BoardData data) {
+		queue.add(data);
+	}
+	
+	public synchronized boolean checkCache(String board) {
+		return cache.contains(board);
+	}
+	
+	public synchronized void addToCache(String board) {
+		cache.add(board);
 	}
 	
 	public Board getBoard() {
@@ -125,35 +121,13 @@ public class Agent {
 	public synchronized void setBestBoardData(BoardData data) {
 		bestBoardData = data;
 	}
-	
-	public synchronized BoardData poll() {
-		return queue.poll();
+
+	public long getTime() {
+		return time;
 	}
-	
-	public synchronized void addWork(BoardData data) {
-		queue.add(data);
-	}
-	
-	public synchronized boolean checkCache(String board) {
-		return cache.contains(board);
-	}
-	
-	public synchronized void addToCache(String board) {
-		cache.add(board);
-	}
-	
-	public synchronized void reportStatus(int row, int col) {
-		workerStatus[row][col] = true;
-	}
-	
-	private boolean workerStatus() {
-		boolean status = true;
-		for (boolean[] col : workerStatus) {
-			for (boolean worker : col) {
-				status = status && worker;
-			}
-		}
-		return status;
+
+	public void setTime(long time) {
+		this.time = time;
 	}
 	
 	private List<Point> getRandomCoordinates(int numCoordinates) {
@@ -173,12 +147,13 @@ public class Agent {
 		
 		return randomCoordinates;
 	}
-
-	public long getTime() {
-		return time;
-	}
-
-	public void setTime(long time) {
-		this.time = time;
+	
+	public static List<Move> appendMoveset(List<Move> moveset, Move newMove) {
+		List<Move> newMoveset = new ArrayList<Move>();
+		for (Move move : moveset) {
+			newMoveset.add(move);
+		}
+		newMoveset.add(newMove);
+		return newMoveset;
 	}
 }

@@ -21,6 +21,8 @@ public class Configurations {
 	public static final String MIN_COMBO_KEY = "mincombo";
 	public static final String BOARD_KEY = "board";
 	
+	public static final int NUM_THREADS = 4;
+	
 	private static int maxNumMoves = 10;
 	private static int numCursorOrbsToTry = 30;
 
