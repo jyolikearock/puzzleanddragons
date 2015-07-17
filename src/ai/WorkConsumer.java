@@ -27,6 +27,8 @@ public class WorkConsumer implements Runnable {
 		
 		while (agent.doWork()) {
 			data = agent.poll();
+			if (data == null) 
+				continue;
 			board = data.getBoard();
 			
 			// compare this board's score to the best one so far

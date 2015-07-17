@@ -3,6 +3,7 @@ package runnable;
 import java.util.List;
 
 import util.FancyPrinter;
+import util.Report;
 import game.Board;
 import game.Move;
 import ai.Agent;
@@ -13,10 +14,62 @@ import ai.Configurations;
 @SuppressWarnings("unused")
 public class Test {
 	
-	private static final int ITERATIONS = 10;
+	private static final int ITERATIONS = 5;
 
 	public static void main(String[] args) {
-		System.out.println(report(run(5)));
+		findOptimalNumCursors();
+	}
+	
+	private static void findOptimalNumCursors() {
+		Board[] boards = new Board[ITERATIONS];
+		for (int i = 0; i < ITERATIONS; i++) {
+			Board board = new Board();
+			board.fill();
+			boards[i] = board;
+		}
+		
+		double score = 0.0;
+		long time = 0;
+		for (int numRandomCursors = 1; numRandomCursors <= 30; numRandomCursors++) {
+			Report report = new Report();
+			for (int i = 0; i < ITERATIONS; i++) {
+				Configurations.setNumCursorOrbsToTry(numRandomCursors);
+				Agent agent = run(boards[i]);
+				report.aggregate(agent);
+			}
+			System.out.println(String.format("Cursor Orbs: %d\t| Score: %.2f\t| Moves: %.2f\t| Time: %.2f",
+					numRandomCursors,
+					report.getScore(),
+					report.getNumMoves(),
+					report.getTime()));
+		}
+	}
+	
+	private static void testThreadPerformance() {
+		int minThreads = 10;
+		int maxThreads = 20;
+		Report[] reports = new Report[maxThreads];
+		for (int i = 0; i < ITERATIONS; i++) {
+			Board board = new Board();
+			board.fill();
+			for (int n = minThreads; n <= maxThreads; n++) {
+				Configurations.setNumThreads(n);
+				Agent agent = run(board);
+				if (reports[n-1] == null)
+					reports[n-1] = new Report();
+				
+				reports[n-1].aggregate(agent);
+			}
+			System.out.println(".");
+		}
+		
+		for (int n = minThreads; n <= maxThreads; n++) {
+			System.out.println(String.format("Threads: %d\t| Score: %.2f\t| Moves: %.2f\t| Time: %.2f",
+					n,
+					reports[n-1].getScore(),
+					reports[n-1].getNumMoves(),
+					reports[n-1].getTime()));
+		}
 	}
 	
 	private static Agent run() {
@@ -45,6 +98,10 @@ public class Test {
 	
 	private static String report(Agent agent) {
 		BoardEvaluator evaluator = new BoardEvaluator();
+		Board originalBoard = Configurations.getBoard();
+		originalBoard.setCursor(
+				agent.getBestBoardData().getBoard().getOriginalCursorRow(),
+				agent.getBestBoardData().getBoard().getOriginalCursorCol());
 		Board board = agent.getBoard();
 		boolean proc = evaluator.procsLeaderSkills(board);
 		double score = agent.getBestBoardData().getScore();
@@ -53,7 +110,8 @@ public class Test {
 		List<Move> moveset = agent.getBestBoardData().getMoveset();
 		return String.format("LS Proc: %b\t| Score: %.2f\t| Moves: %d\t| Time: %d"
 				+ "\n%s"
-				+ "\nBoard:"
+				+ "\n"
+				+ "\n%s"
 				+ "\n%s"
 				+ "\n%s",
 				proc,
@@ -61,37 +119,9 @@ public class Test {
 				numMoves,
 				time,
 				moveset,
-				board.toCode(),
-				board);
-	}
-	
-	private static void findOptimalNumCursors() {
-		int iterations = 10;
-		Board[] boards = new Board[iterations];
-		for (int i = 0; i < iterations; i++) {
-			Board board = new Board();
-			board.fill();
-			boards[i] = board;
-		}
-		
-		double score = 0.0;
-		long time = 0;
-		for (int numRandomCursors = 1; numRandomCursors <= 30; numRandomCursors++) {
-			for (int i = 0; i < iterations; i++) {
-				Configurations.setNumCursorOrbsToTry(numRandomCursors);
-				Agent agent = run(boards[i]);
-				score += agent.getBestBoardData().getScore();
-				time += agent.getTime();
-			}
-			score /= iterations;
-			time /= iterations;
-			System.out.println(String.format("%d cursor orbs sampled\t| "
-					+ "Average score: %.2f\t| "
-					+ "Average time: %d",
-					numRandomCursors,
-					score,
-					time));
-		}
+				originalBoard.toCode(),
+				originalBoard,
+				board.toCode());
 	}
 
 }

@@ -22,9 +22,9 @@ public class Configurations {
 	public static final String BOARD_KEY = "board";
 	
 	// effectively constants, but can be configured
-	private static int numThreads = 4;
+	private static int numThreads = 8;
 	private static int timeLimitMillis = 3 * 1000;
-	private static int numCursorOrbsToTry = 30;
+	private static int numCursorOrbsToTry = 20;
 	private static Board board;
 	private static Map<String, String> teamInfo;
 	
