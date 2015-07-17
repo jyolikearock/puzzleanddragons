@@ -34,7 +34,7 @@ public class AttributeInputPanel extends JPanel {
 	public AttributeInputPanel() {
 		super();
 		UIMaster.setAttributeInputPanel(this);
-		teamInfo = new Configurations().getTeamInfo();
+		teamInfo = Configurations.getTeamInfo();
 		
 		attributeNames = new JPanel(new GridLayout(ROWS, COLS));
 		attributeValues = new JPanel(new GridLayout(ROWS, COLS));

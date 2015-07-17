@@ -3,6 +3,7 @@ package runnable;
 import game.Board;
 import game.Color;
 
+@SuppressWarnings("unused")
 public class LSProcRateCalculator {
 	
 	private static final int NUM_ITERATIONS = 100000;

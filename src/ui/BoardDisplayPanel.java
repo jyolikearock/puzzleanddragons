@@ -20,7 +20,7 @@ import util.StringToColorConverter;
 @SuppressWarnings("serial")
 public class BoardDisplayPanel extends JPanel implements ActionListener {
 
-	private static final int DELAY = 500;
+	private static final int DELAY = 100;
 	private static final int SET_CURSOR_FRAME = -1;
 	private static final int STOP_ANIMATION_FRAME = -2;
 	private static final int ORB_WIDTH = 100;
@@ -35,7 +35,7 @@ public class BoardDisplayPanel extends JPanel implements ActionListener {
 		super(new GridLayout(Board.NUM_ROWS, Board.NUM_COLS));
 		UIMaster.setBoardDisplayPanel(this);
 		this.setPreferredSize(new Dimension(Board.NUM_COLS * ORB_WIDTH, Board.NUM_ROWS * ORB_WIDTH));
-		Board board = new Configurations().getBoard();
+		Board board = Configurations.getBoard();
 		drawBoard(board.toCode());
 	}
 
@@ -69,15 +69,6 @@ public class BoardDisplayPanel extends JPanel implements ActionListener {
 	}
 	
 	public void drawBoard(String boardText) {
-//		while (animationStatus) {
-//			System.out.println("Waiting for animation to stop; animation in motion: " + animationStatus);
-//			animationFrame = STOP_ANIMATION_FRAME;
-//			try {
-//				Thread.sleep(1000);
-//			} catch (InterruptedException e) {
-//				e.printStackTrace();
-//			}
-//		}
 		String color;
 		String[] split = boardText.split("");
 		for (int r = 0; r < Board.NUM_ROWS; r++) {

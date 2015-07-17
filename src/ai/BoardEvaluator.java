@@ -5,11 +5,8 @@ import game.Color;
 import game.Match;
 import game.MatchFinder;
 
-import java.awt.Point;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -17,26 +14,29 @@ import leaderskill.LeaderSkill;
 
 public class BoardEvaluator {
 	
-	private Configurations configurations;
 	private LeaderSkill leaderSkill1;
 	private LeaderSkill leaderSkill2;
 	
-	private Board boardCopy;
 	private Set<Match> matches;
 	private Set<Match> allMatches;
 	private Map<Color, Double> damageReport;
 	private MatchFinder matchFinder;
 	
-	public BoardEvaluator(Configurations configurations) {
-		this.configurations = configurations;
-		leaderSkill1 = configurations.getLeaderSkill(1);
-		leaderSkill2 = configurations.getLeaderSkill(2);
+	public BoardEvaluator() {
+		leaderSkill1 = Configurations.getLeaderSkill(1);
+		leaderSkill2 = Configurations.getLeaderSkill(2);
 		matchFinder = new MatchFinder();
 	}
 	
 	public double evaluate(Board board) {
-		boardCopy = new Board(board);
-		allMatches = new HashSet<Match>();
+		allMatches = getAllMatches(board);
+		return evaluateMatches(allMatches);
+	}
+	
+	private Set<Match> getAllMatches(Board board) {
+		Set<Match> allMatches = new LinkedHashSet<Match>();
+		
+		Board boardCopy = new Board(board);
 		while ((matches = matchFinder.findMatches(boardCopy)).size() != 0) {
 			for (Match match : matches) {
 				allMatches.add(match);
@@ -44,18 +44,19 @@ public class BoardEvaluator {
 			boardCopy.clear(matches);
 			boardCopy.fall();
 		}
-		return evaluateMatches(allMatches);
+		
+		return allMatches;
 	}
 	
 	private double evaluateMatches(Set<Match> matches) {
 		damageReport = new HashMap<Color, Double>();
-		if (matches.size() < configurations.getMinCombos()) return 0.0;
+		if (matches.size() < Configurations.getMinCombos()) return 0.0;
 		
 		Map<Color, Integer> rowEnhances = new HashMap<Color, Integer>();
 		Color color;
 		for (Match match : matches) {
 			color = match.getColor();
-			if (match.isRow() && configurations.containsKey(color.toString() + Configurations.ROW_ENHANCE_KEY)) {
+			if (match.isRow() && Configurations.containsKey(color.toString() + Configurations.ROW_ENHANCE_KEY)) {
 				if (rowEnhances.containsKey(color)) {
 					int numRowEnhances = rowEnhances.get(color).intValue();
 					rowEnhances.put(color, new Integer(numRowEnhances + 1));
@@ -70,7 +71,8 @@ public class BoardEvaluator {
 			color = match.getColor();
 			double score;
 			if (rowEnhances.containsKey(color)) {
-				double rowEnhanceMultiplier = 1 + (rowEnhances.get(color) * configurations.getNumRowEnhances(color) * 0.1);
+				double rowEnhanceMultiplier = 
+						1 + (rowEnhances.get(color) * Configurations.getNumRowEnhances(color) * 0.1);
 				score = rowEnhanceMultiplier * evaluateMatch(match);
 			} else {
 				score = evaluateMatch(match);
@@ -97,15 +99,7 @@ public class BoardEvaluator {
 	}
 	
 	public int getNumCombos(Board board) {
-		boardCopy = new Board(board);
-		allMatches = new HashSet<Match>();
-		while ((matches = matchFinder.findMatches(boardCopy)).size() != 0) {
-			for (Match match : matches) {
-				allMatches.add(match);
-			}
-			boardCopy.clear(matches);
-			boardCopy.fall();
-		}
+		allMatches = getAllMatches(board);
 		return allMatches.size();
 	}
 	
@@ -113,10 +107,10 @@ public class BoardEvaluator {
 		Color color = match.getColor();		
 		double score = 0.0;
 		double baseScore = 0.0;
-		baseScore = configurations.getAttributeValue(color);
+		baseScore = Configurations.getAttributeValue(color);
 		score = baseScore * (1 + (match.size() - 3) * 0.25);
 		if (match.size() == 4) {
-			double tpaMultiplier = configurations.getTPAMultiplier(color);
+			double tpaMultiplier = Configurations.getTPAMultiplier(color);
 			score *= tpaMultiplier;
 		}
 		return score;
@@ -135,73 +129,26 @@ public class BoardEvaluator {
 		return builder.toString();
 	}
 	
-	public boolean canProcLeaderSkills(Board board, int numRemainingMoves) {
-		return canProcLeaderSkill(board, numRemainingMoves, leaderSkill1) 
-				&& canProcLeaderSkill(board, numRemainingMoves, leaderSkill2);
+	public boolean procsLeaderSkills(Board board) {
+		return procsLeaderSkill(board, 1) && procsLeaderSkill(board, 2);
 	}
 	
-	private boolean canProcLeaderSkill(Board board, int numRemainingMoves, LeaderSkill leaderSkill) {
-		Set<Color> requiredColors = leaderSkill.getRequiredColors();
-		if (requiredColors == null || requiredColors.isEmpty()) {
+	private boolean procsLeaderSkill(Board board, int leaderSkillIndex) {
+		allMatches = getAllMatches(board);
+		LeaderSkill leaderSkill;
+		if (leaderSkillIndex == 1)
+			leaderSkill = leaderSkill1;
+		else if (leaderSkillIndex == 2)
+			leaderSkill = leaderSkill2;
+		else
+			return false;
+		
+		if (leaderSkill.getRequiredColors().isEmpty())
 			return true;
+		
+		for (Color color : leaderSkill.getRequiredColors()) {
+			return leaderSkill.getMultiplier(allMatches, color) > 1.0;
 		}
-		
-		Map<Color, List<Point>> coordinatesByColor = getCoordinatesByColor(board);
-		for (Color color : requiredColors) {
-			if (!coordinatesByColor.containsKey(color)) {
-				return false;
-			} else {
-				int minDistance = getMinDistance(coordinatesByColor.get(color));
-				if (minDistance - 1 > numRemainingMoves) {
-					return false;
-				}
-			}
-		}
-		return true;
-	}
-	
-	private Map<Color, List<Point>> getCoordinatesByColor(Board board) {
-		Map<Color, List<Point>> coordinatesByColor = new HashMap<Color, List<Point>>();
-		
-		Color color;
-		for (int r = 0; r < Board.NUM_ROWS; r++) {
-			for (int c = 0; c < Board.NUM_COLS; c++) {
-				color = board.get(r, c).getColor();
-				if (coordinatesByColor.containsKey(color)) {
-					coordinatesByColor.get(color).add(new Point(r, c));
-				} else {
-					List<Point> coordinates = new ArrayList<Point>();
-					coordinates.add(new Point(r, c));
-					coordinatesByColor.put(color, coordinates);
-				}
-			}
-		}
-		
-		return coordinatesByColor;
-	}
-	
-	private int getMinDistance(List<Point> points) {
-		int minDistance = Integer.MAX_VALUE;
-		
-		Point p1, p2;
-		int distance;
-		for (int i = 0; i < points.size() - 1; i ++) {
-			for (int j = i + 1; j < points.size(); j++) {
-				p1 = points.get(i);
-				p2 = points.get(j);
-				distance = getEuclideanDistance(p1, p2);
-				if (distance == 1) {
-					return 1;
-				} else if (distance < minDistance) {
-					minDistance = distance;
-				}
-			}
-		}
-		
-		return minDistance;
-	}
-	
-	private int getEuclideanDistance(Point p1, Point p2) {
-		return Math.abs(p1.x - p2.x) + Math.abs(p1.y - p2.y);
+		return false;
 	}
 }

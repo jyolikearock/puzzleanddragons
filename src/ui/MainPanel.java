@@ -67,11 +67,11 @@ public class MainPanel extends JPanel implements ActionListener {
 			BoardData data = agent.getBestBoardData();
 			int cursorRow = data.getBoard().getOriginalCursorRow();
 			int cursorCol = data.getBoard().getOriginalCursorCol();
-			Board board = new Configurations().getBoard();
+			Board board = Configurations.getBoard();
 			board.setCursor(cursorRow, cursorCol);
 			List<Move> moveset = data.getMoveset();
 			
-			BoardEvaluator boardEvaluator = new BoardEvaluator(new Configurations());
+			BoardEvaluator boardEvaluator = new BoardEvaluator();
 			boardEvaluator.evaluate(data.getBoard());
 			logPanel.setDamageReport(boardEvaluator.getDamageReport());
 			logPanel.setMoveset(moveset.toString());

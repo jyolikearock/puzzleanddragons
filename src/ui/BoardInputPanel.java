@@ -44,7 +44,7 @@ public class BoardInputPanel extends JPanel implements ActionListener {
 	public BoardInputPanel() {
 		super();
 		UIMaster.setBoardInputPanel(this);
-		board = new Configurations().getBoard();
+		board = Configurations.getBoard();
 		
 		boardText = new JTextArea();
 		boardText.setFont(new Font("monospaced", Font.PLAIN, FONT_SIZE));

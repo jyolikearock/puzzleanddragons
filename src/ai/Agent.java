@@ -21,20 +21,15 @@ public class Agent {
 	private BoardData bestBoardData;
 	private long time;
 
-	private Configurations configurations;
 	private Board board;
-	private int maxNumMoves;
 	private BoardEvaluator boardEvaluator;
 	private Queue<BoardData> queue;
 	private Set<String> cache;
-	
-	public Agent() {
-		this.configurations = new Configurations();
-	}
+	private boolean doWork;
 	
 	public void solve() {
-		board = configurations.getBoard();
-		boardEvaluator = new BoardEvaluator(configurations);
+		board = Configurations.getBoard();
+		boardEvaluator = new BoardEvaluator();
 		double score = boardEvaluator.evaluate(board);
 		bestBoardData = new BoardData(board, score, new ArrayList<Move>());
 		this.queue = new LinkedList<BoardData>();
@@ -67,18 +62,20 @@ public class Agent {
 		}
 		
 		// kick off threads
-		for (int i = 0; i < Configurations.NUM_THREADS; i++) {
+		this.doWork = true;
+		for (int i = 0; i < Configurations.getNumThreads(); i++) {
 			Thread worker = new Thread(new WorkConsumer(this));
 			worker.start();
 		}
 		
-		// wait 5 seconds
+		// wait
 		try {
-			Thread.sleep(5 * 1000);
+			Thread.sleep(Configurations.getTimeLimitMillis());
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 			System.exit(0);
 		}
+		this.doWork = false;
 		
 		board.setCursor(
 				bestBoardData.getBoard().getOriginalCursorRow(), 
@@ -104,10 +101,6 @@ public class Agent {
 	
 	public Board getBoard() {
 		return board;
-	}
-	
-	public int getMaxNumMoves() {
-		return maxNumMoves;
 	}
 	
 	public Map<String, String> getTeamInfo() {
@@ -155,5 +148,9 @@ public class Agent {
 		}
 		newMoveset.add(newMove);
 		return newMoveset;
+	}
+
+	public synchronized boolean doWork() {
+		return doWork;
 	}
 }

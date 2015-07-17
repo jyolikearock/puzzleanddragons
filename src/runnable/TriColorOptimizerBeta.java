@@ -6,7 +6,6 @@ import game.Color;
 import java.util.Random;
 
 import ai.BoardEvaluator;
-import ai.Configurations;
 
 /**
  * Finds the optimal board set up for a board with 2 colors
@@ -20,8 +19,7 @@ public class TriColorOptimizerBeta {
 	private static final Color COLOR3 = Color.L;
 	
 	private static final int NUM_TOTAL_ORBS = Board.NUM_COLS * Board.NUM_ROWS;
-	private static final Configurations CONFIGURATIONS = new Configurations();
-	private static final BoardEvaluator EVALUATOR = new BoardEvaluator(CONFIGURATIONS);
+	private static final BoardEvaluator EVALUATOR = new BoardEvaluator();
 	
 	private static int bestCombo;
 	private static Board bestBoard;

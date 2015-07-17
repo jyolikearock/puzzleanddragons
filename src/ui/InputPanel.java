@@ -29,7 +29,7 @@ public class InputPanel extends JPanel {
 		setPreferredSize(new Dimension(2 * ORB_WIDTH, (Board.NUM_ROWS - 1) * ORB_WIDTH));
 		BoxLayout layout = new BoxLayout(this, BoxLayout.Y_AXIS);
 		setLayout(layout);
-		teamInfo = new Configurations().getTeamInfo();
+		teamInfo = Configurations.getTeamInfo();
 		
 		attributeInputPanel = new AttributeInputPanel();
 		leaderSkillPanel = new LeaderSkillPanel();

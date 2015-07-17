@@ -7,7 +7,6 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 import ai.BoardEvaluator;
-import ai.Configurations;
 
 /**
  * Finds the optimal board set up for a board with 2 colors
@@ -21,8 +20,7 @@ public class TriColorOptimizerAlpha {
 	private static final Color COLOR3 = Color.D;
 	
 	private static final int NUM_TOTAL_ORBS = Board.NUM_COLS * Board.NUM_ROWS;
-	private static final Configurations CONFIGURATIONS = new Configurations();
-	private static final BoardEvaluator EVALUATOR = new BoardEvaluator(CONFIGURATIONS);
+	private static final BoardEvaluator EVALUATOR = new BoardEvaluator();
 	
 	private static Queue<WorkUnit> workQueue;
 	private static int bestCombo;

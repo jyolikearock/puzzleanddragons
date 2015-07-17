@@ -10,12 +10,10 @@ public class WorkConsumer implements Runnable {
 	
 	Agent agent;
 	private BoardEvaluator boardEvaluator;
-	private boolean useCache;
 	
 	public WorkConsumer(Agent agent) {
 		this.agent = agent;
-		this.boardEvaluator = new BoardEvaluator(new Configurations());
-		this.useCache = Configurations.useCache();
+		this.boardEvaluator = new BoardEvaluator();
 	}
 
 	@Override
@@ -27,18 +25,9 @@ public class WorkConsumer implements Runnable {
 		Set<Move> validMoves;
 		double score;
 		
-		while (true) {
+		while (agent.doWork()) {
 			data = agent.poll();
 			board = data.getBoard();
-			
-			// skip if this board has already been explored
-			// otherwise, add it to the cache and continue
-			if (useCache) {
-				if (agent.checkCache(board.uniqueCode())) {
-					continue;
-				}
-				else agent.addToCache(board.uniqueCode());
-			}
 			
 			// compare this board's score to the best one so far
 			moveset = data.getMoveset();

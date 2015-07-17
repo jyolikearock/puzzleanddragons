@@ -25,7 +25,7 @@ public class LeaderSkillPanel extends JPanel {
 		UIMaster.setLeaderSkillPanel(this);
 		BoxLayout layout = new BoxLayout(this, BoxLayout.Y_AXIS);
 		setLayout(layout);
-		teamInfo = new Configurations().getTeamInfo();
+		teamInfo = Configurations.getTeamInfo();
 		String[] availableLeaderSkills = getAvailableLeaderSkills();
 		
 		JPanel lsPanel1 = new JPanel();

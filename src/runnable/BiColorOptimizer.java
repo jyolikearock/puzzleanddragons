@@ -1,9 +1,8 @@
 package runnable;
 
-import ai.BoardEvaluator;
-import ai.Configurations;
 import game.Board;
 import game.Color;
+import ai.BoardEvaluator;
 
 /**
  * Finds the optimal board set up for a board with 2 colors
@@ -16,8 +15,7 @@ public class BiColorOptimizer {
 	private static final Color COLOR2 = Color.L;
 	
 	private static final int NUM_TOTAL_ORBS = Board.NUM_COLS * Board.NUM_ROWS;
-	private static final Configurations CONFIGURATIONS = new Configurations();
-	private static final BoardEvaluator EVALUATOR = new BoardEvaluator(CONFIGURATIONS);
+	private static final BoardEvaluator EVALUATOR = new BoardEvaluator();
 	
 	public static void main(String[] args) {
 		for (int i = 0; i <= NUM_TOTAL_ORBS / 2 ; i++) {
