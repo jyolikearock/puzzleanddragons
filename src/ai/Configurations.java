@@ -23,7 +23,7 @@ public class Configurations {
 	
 	// effectively constants, but can be configured
 	private static int numThreads = 8;
-	private static int timeLimitMillis = 3 * 1000;
+	private static int timeLimitMillis = 6 * 1000;
 	private static int numCursorOrbsToTry = 20;
 	private static Board board;
 	private static Map<String, String> teamInfo;

@@ -14,13 +14,14 @@ import java.util.List;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
+import ai.BoardData;
 import ai.Configurations;
 import util.StringToColorConverter;
 
 @SuppressWarnings("serial")
 public class BoardDisplayPanel extends JPanel implements ActionListener {
 
-	private static final int DELAY = 100;
+	private static final int DELAY = 200;
 	private static final int SET_CURSOR_FRAME = -1;
 	private static final int STOP_ANIMATION_FRAME = -2;
 	private static final int ORB_WIDTH = 100;
@@ -79,7 +80,15 @@ public class BoardDisplayPanel extends JPanel implements ActionListener {
 		}
 	}
 	
-	public void execute(Board board, List<Move> moveset) {
+	public void execute(BoardData data) {
+		int cursorRow = data.getBoard().getOriginalCursorRow();
+		int cursorCol = data.getBoard().getOriginalCursorCol();
+		Board board = Configurations.getBoard();
+		board.setCursor(cursorRow, cursorCol);
+		execute(board, data.getMoveset());
+	}
+	
+	private void execute(Board board, List<Move> moveset) {
 		drawBoard(board.toCode());
 		
 		if (timer != null) {

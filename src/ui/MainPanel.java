@@ -27,7 +27,8 @@ public class MainPanel extends JPanel implements ActionListener {
 	DisplayPanel displayPanel;
 	InputPanel inputPanel;
 	LogPanel logPanel;
-	JButton saveButton, solveButton;
+	JButton saveButton, solveButton, replayButton;
+	BoardData data;
 
 	public MainPanel() {
 		super(new BorderLayout());
@@ -40,12 +41,15 @@ public class MainPanel extends JPanel implements ActionListener {
 		logPanel = new LogPanel();
 		
 		JPanel buttonsPanel = new JPanel();
-		saveButton = new JButton("Store Config");
+		saveButton = new JButton("Save");
 		solveButton = new JButton("Solve");
+		replayButton = new JButton("Replay");
 		saveButton.addActionListener(this);
 		solveButton.addActionListener(this);
+		replayButton.addActionListener(this);
 		buttonsPanel.add(saveButton);
 		buttonsPanel.add(solveButton);
+		buttonsPanel.add(replayButton);
 		
 		input.add(inputPanel);
 		input.add(buttonsPanel);
@@ -53,6 +57,8 @@ public class MainPanel extends JPanel implements ActionListener {
 		add(input, BorderLayout.LINE_START);
 		add(displayPanel, BorderLayout.CENTER);
 		add(logPanel, BorderLayout.PAGE_END);
+		
+		data = null;
 	}
 
 	@Override
@@ -64,7 +70,7 @@ public class MainPanel extends JPanel implements ActionListener {
 			updateConfigurations();
 			Agent agent = new Agent();
 			agent.solve();
-			BoardData data = agent.getBestBoardData();
+			data = agent.getBestBoardData();
 			int cursorRow = data.getBoard().getOriginalCursorRow();
 			int cursorCol = data.getBoard().getOriginalCursorCol();
 			Board board = Configurations.getBoard();
@@ -78,7 +84,12 @@ public class MainPanel extends JPanel implements ActionListener {
 			logPanel.setBoard(FancyPrinter.toString(board, moveset));
 			
 			BoardDisplayPanel boardDisplayPanel = UIMaster.getBoardDisplayPanel();
-			boardDisplayPanel.execute(board, moveset);
+			boardDisplayPanel.execute(data);
+		} else if (e.getSource() == replayButton) {
+			if (data != null) {
+				BoardDisplayPanel boardDisplayPanel = UIMaster.getBoardDisplayPanel();
+				boardDisplayPanel.execute(data);
+			}
 		}
 	}
 	
