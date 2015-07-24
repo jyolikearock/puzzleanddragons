@@ -2,9 +2,12 @@ package runnable;
 
 import java.util.List;
 
+import leaderskill.RaLD;
+import util.Constants;
 import util.FancyPrinter;
 import util.Report;
 import game.Board;
+import game.Color;
 import game.Move;
 import ai.Agent;
 import ai.BoardData;
@@ -17,7 +20,27 @@ public class Test {
 	private static final int ITERATIONS = 5;
 
 	public static void main(String[] args) {
-		findOptimalNumCursors();
+		Configurations.setLeaderSkill(1, new RaLD());
+		Configurations.setLeaderSkill(2, new RaLD());
+		System.out.println(report(run(5)));
+	}
+	
+	private static void testFindThreeClosestOrbs() {
+		Configurations.setLeaderSkill(1, new RaLD());
+		Configurations.setLeaderSkill(2, new RaLD());
+		BoardEvaluator evaluator = new BoardEvaluator();
+		Board board = new Board();
+		board.fill();
+
+		System.out.println(board);
+		System.out.println(board.toCode());
+		System.out.println(evaluator.predictBestCursorColor(board));
+		for (Color color : Constants.COLORS) {
+			System.out.println(String.format(
+					"%s : %d",
+					color,
+					evaluator.findThreeClosestOrbs(board, color)));
+		}
 	}
 	
 	private static void findOptimalNumCursors() {

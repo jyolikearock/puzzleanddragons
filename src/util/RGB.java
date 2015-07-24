@@ -27,9 +27,5 @@ public class RGB {
 	public String toString() {
 		return red + "," + green + "," + blue;
 	}
-	
-//	public int hashCode() {
-//		return red * 1000000 + green * 1000 + blue;
-//	}
 
 }

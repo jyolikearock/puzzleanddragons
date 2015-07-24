@@ -151,4 +151,58 @@ public class BoardEvaluator {
 		}
 		return false;
 	}
+	
+	public Color predictBestCursorColor(Board board) {
+		Color bestColor = null;
+		
+		int maxDist = -1;
+		Set<Color> colorsToMatch = leaderSkill1.getRequiredColors();
+		colorsToMatch.addAll(leaderSkill2.getRequiredColors());
+		if (colorsToMatch == null || colorsToMatch.isEmpty()) {
+			colorsToMatch.add(Color.R);
+			colorsToMatch.add(Color.G);
+			colorsToMatch.add(Color.B);
+			colorsToMatch.add(Color.L);
+			colorsToMatch.add(Color.D);
+		}
+		for (Color color : colorsToMatch) {
+			int dist = findThreeClosestOrbs(board, color);
+			if (dist > maxDist) {
+				bestColor = color;
+				maxDist = dist;
+			}
+		}
+		
+		return bestColor;
+	}
+	
+	public int findThreeClosestOrbs(Board board, Color color) {
+		int secondClosestDist = Board.NUM_COLS;
+		
+		int firstClosestCol = -1;
+		int secondClosestCol = -1;
+		for (int col = 0; col < Board.NUM_COLS; col++) {
+			for (int row = 0; row < Board.NUM_ROWS; row++) {
+				Color c = board.get(row, col).getColor();
+				if (!c.equals(color))
+					continue;
+				if (firstClosestCol == -1) {
+					firstClosestCol = col;
+				} else if (secondClosestCol == -1) {
+					secondClosestCol = col;
+				} else {
+					int dist1 = col - firstClosestCol;
+					int dist2 = firstClosestCol - secondClosestCol;
+					int longer = Math.max(dist1, dist2);
+					if (longer < secondClosestDist)
+						secondClosestDist = longer;
+					secondClosestCol = firstClosestCol;
+					firstClosestCol = col;
+				}
+				
+			}
+		}
+		
+		return secondClosestDist == Board.NUM_COLS ? -1 : secondClosestDist;
+	}
 }

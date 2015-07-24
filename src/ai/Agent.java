@@ -1,6 +1,7 @@
 package ai;
 
 import game.Board;
+import game.Color;
 import game.Move;
 
 import java.awt.Point;
@@ -41,25 +42,37 @@ public class Agent {
 		Board newBoard;
 		
 		// initialize work queue
-		int numCursorOrbsToTry = Configurations.getNumCursorOrbsToTry();
-		if (numCursorOrbsToTry == numRows * numCols) {
-			for (int r = 0; r < numRows; r++) {
-				for (int c = 0; c < numCols; c++) {
+		Color bestCursorColor = boardEvaluator.predictBestCursorColor(board);
+		for (int r = 0; r < numRows; r++) {
+			for (int c = 0; c < numCols; c++) {
+				if (board.get(r, c).getColor().equals(bestCursorColor)) {
 					newBoard = new Board(board);
 					newBoard.setCursor(r, c);
 					data = new BoardData(newBoard, -1.0, new ArrayList<Move>());
 					queue.add(data);
 				}
 			}
-		} else {
-			List<Point> randomCoordinates = getRandomCoordinates(numCursorOrbsToTry);
-			for (Point p : randomCoordinates) {
-				newBoard = new Board(board);
-				newBoard.setCursor(p.x, p.y);
-				data = new BoardData(newBoard, -1.0, new ArrayList<Move>());
-				queue.add(data);
-			}
 		}
+		
+//		int numCursorOrbsToTry = Configurations.getNumCursorOrbsToTry();
+//		if (numCursorOrbsToTry == numRows * numCols) {
+//			for (int r = 0; r < numRows; r++) {
+//				for (int c = 0; c < numCols; c++) {
+//					newBoard = new Board(board);
+//					newBoard.setCursor(r, c);
+//					data = new BoardData(newBoard, -1.0, new ArrayList<Move>());
+//					queue.add(data);
+//				}
+//			}
+//		} else {
+//			List<Point> randomCoordinates = getRandomCoordinates(numCursorOrbsToTry);
+//			for (Point p : randomCoordinates) {
+//				newBoard = new Board(board);
+//				newBoard.setCursor(p.x, p.y);
+//				data = new BoardData(newBoard, -1.0, new ArrayList<Move>());
+//				queue.add(data);
+//			}
+//		}
 		
 		// kick off threads
 		this.doWork = true;
@@ -81,6 +94,10 @@ public class Agent {
 				bestBoardData.getBoard().getOriginalCursorRow(), 
 				bestBoardData.getBoard().getOriginalCursorCol());
 		this.board = MovesetExecutor.execute(board, bestBoardData.getMoveset());
+		
+		// only return if leader skills are proc'd
+		if (!boardEvaluator.procsLeaderSkills(board))
+			bestBoardData = new BoardData(Configurations.getBoard(), 0.0, new ArrayList<Move>());
 	}
 	
 	public synchronized BoardData poll() {

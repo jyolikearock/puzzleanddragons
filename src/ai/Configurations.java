@@ -74,6 +74,15 @@ public class Configurations {
 		}
 	}
 	
+	public static void setLeaderSkill(int i, LeaderSkill ls) {
+		if (i != 1 && i != 2) {
+			System.out.println("You must select either Leaderskill 1 or Leaderskill 2");
+			System.exit(0);
+		}
+		String key = LEADERSKILL_KEY + i;
+		teamInfo.put(key, ls.getClass().getName().split("\\.")[1]);
+	}
+	
 	public static int getMinCombos() {
 		return 
 				(teamInfo.containsKey(MIN_COMBO_KEY) && !teamInfo.get(MIN_COMBO_KEY).isEmpty()) ? 

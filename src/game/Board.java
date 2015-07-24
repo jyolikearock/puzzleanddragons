@@ -251,7 +251,8 @@ public class Board {
 				if (orbs[r][c] == null) builder.append("( ) ");
 				else builder.append(orbs[r][c] + " ");
 			}
-			builder.append("\n\n");
+			if (r != NUM_ROWS - 1)
+				builder.append("\n\n");
 		}
 		return builder.toString();
 	}

@@ -52,6 +52,7 @@ public class BoardDisplayPanel extends JPanel implements ActionListener {
 			color = board.get(cursorRow, cursorCol).getColor();
 			setCursor(cursorRow, cursorCol, color);
 			animationFrame++;
+			timer.setDelay(DELAY);
 		} else {
 			move = moveset.get(animationFrame);
 			board.move(move);
@@ -95,7 +96,7 @@ public class BoardDisplayPanel extends JPanel implements ActionListener {
 			timer.stop();
 			timer = null;
 		}
-		timer = new Timer(DELAY, this);
+		timer = new Timer(5 * DELAY, this);
 		animationFrame = SET_CURSOR_FRAME;
 		this.board = new Board(board);
 		this.moveset = moveset;
