@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 
 import leaderskill.LeaderSkill;
 
@@ -152,8 +153,8 @@ public class BoardEvaluator {
 		return false;
 	}
 	
-	public Color predictBestCursorColor(Board board) {
-		Color bestColor = null;
+	public Set<Color> predictBestCursorColors(Board board) {
+		Set<Color> bestColors = new TreeSet<Color>();
 		
 		int maxDist = -1;
 		Set<Color> colorsToMatch = leaderSkill1.getRequiredColors();
@@ -168,12 +169,14 @@ public class BoardEvaluator {
 		for (Color color : colorsToMatch) {
 			int dist = findThreeClosestOrbs(board, color);
 			if (dist > maxDist) {
-				bestColor = color;
+				bestColors.clear();
+				bestColors.add(color);
 				maxDist = dist;
-			}
+			} else if (dist == maxDist)
+				bestColors.add(color);
 		}
 		
-		return bestColor;
+		return bestColors;
 	}
 	
 	public int findThreeClosestOrbs(Board board, Color color) {

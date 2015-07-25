@@ -20,6 +20,10 @@ public class Test {
 	private static final int ITERATIONS = 5;
 
 	public static void main(String[] args) {
+		testFindThreeClosestOrbs();
+	}
+	
+	private static void tryRa() {
 		Configurations.setLeaderSkill(1, new RaLD());
 		Configurations.setLeaderSkill(2, new RaLD());
 		System.out.println(report(run(5)));
@@ -34,7 +38,7 @@ public class Test {
 
 		System.out.println(board);
 		System.out.println(board.toCode());
-		System.out.println(evaluator.predictBestCursorColor(board));
+		System.out.println(evaluator.predictBestCursorColors(board));
 		for (Color color : Constants.COLORS) {
 			System.out.println(String.format(
 					"%s : %d",
