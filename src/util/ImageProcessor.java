@@ -26,15 +26,17 @@ public class ImageProcessor {
 	private static final int NUM_ROWS = Board.NUM_ROWS;
 	private static final int NUM_COLS = Board.NUM_COLS;
 	
-	private static final String COLOR_MAP_PATH = "./resources/colormap.cfg";
+	private static final String COLORMAP_SAMPLES_PATH = "./resources/colormaps/";
+	private static final String OVERRIDE_PATH = "./resources/colormap-override.cfg";
+	private static final String COLORMAP_PATH = "./resources/colormap.cfg";
 	private static final String RGB_DETAILS_PATH = "./out/rgb-details";
 	
 	private static Map<RGB, Color> colorMap;
 	
-	public ImageProcessor(String colorMapDir) {
+	public ImageProcessor() {
 		colorMap = new HashMap<RGB, Color>();
 		loadColorMap();
-		if (colorMap.isEmpty()) loadColorMap(colorMapDir);
+		if (colorMap.isEmpty()) populateColorMap();
 	}
 	
 	public String convertImage(BufferedImage image) {
@@ -111,36 +113,36 @@ public class ImageProcessor {
 		}
 	}
 	
-	public void loadColorMap(String dir) {
-		File folder = new File(dir);
-		String filename;
-		BufferedImage image;
-		RGB[][] rgbMap;
-		for (File file : folder.listFiles()) {
-			try {
-				filename = file.getName();
-				if (filename.equals("manual-colormap.cfg")) {
-					Scanner scanner = new Scanner(file);
-					String line;
-					while (scanner.hasNextLine()) {
-						line = scanner.nextLine();
-						String key = line.split(":")[0];
-						String val = line.split(":")[1];
-						int r = Integer.parseInt(key.split(",")[0]);
-						int g = Integer.parseInt(key.split(",")[1]);
-						int b = Integer.parseInt(key.split(",")[2]);
-						Color color = StringToColorConverter.getColor(val);
-						colorMap.put(new RGB(r, g, b), color);
-					}
-					scanner.close();
-				}
+	public void populateColorMap() {		
+		Scanner scanner = null;
+		PrintWriter writer = null;
+		try {
+			
+			// populate entries from the colormap override file first
+			scanner = new Scanner(new File(OVERRIDE_PATH));
+			String line;
+			while (scanner.hasNextLine()) {
+				line = scanner.nextLine();
+				String key = line.split(":")[0];
+				String val = line.split(":")[1];
+				int r = Integer.parseInt(key.split(",")[0]);
+				int g = Integer.parseInt(key.split(",")[1]);
+				int b = Integer.parseInt(key.split(",")[2]);
+				Color color = StringToColorConverter.getColor(val);
+				colorMap.put(new RGB(r, g, b), color);
+			}
+			
+			// populate entries using sample boards
+			File folder = new File(COLORMAP_SAMPLES_PATH);
+			for (File file : folder.listFiles()) {
+				String filename = file.getName();
 				if (!filename.contains(".PNG")) {
 					System.out.println("Ignoring " + filename + " because it is not .PNG format");
 					continue;
 				}
 				filename = filename.split("//.PNG")[0];
-				image = ImageIO.read(file);
-				rgbMap = parseBoardImage(image, 0, 0);
+				BufferedImage image = ImageIO.read(file);
+				RGB[][] rgbMap = parseBoardImage(image, 0, 0);
 				String character;
 				Color color;
 				for (int r = 0; r < NUM_ROWS; r++) {
@@ -150,21 +152,26 @@ public class ImageProcessor {
 						colorMap.put(rgbMap[r][c], color);
 					}
 				}
-				
-				PrintWriter writer = new PrintWriter(COLOR_MAP_PATH);
-				for (RGB key : colorMap.keySet()) {
-					writer.println(key + ":" + colorMap.get(key));
-				}
-				writer.close();
-			} catch (IOException e) {
-				e.printStackTrace();
 			}
+			
+			// write entries to colormap file
+			writer = new PrintWriter(COLORMAP_PATH);
+			for (RGB key : colorMap.keySet()) {
+				writer.println(key + ":" + colorMap.get(key));
+			}
+			writer.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.exit(0);
+		} finally {
+			if (scanner != null) try { scanner.close(); } catch (Exception e) { }
+			if (writer != null) try { writer.close(); } catch (Exception e) { }
 		}
 	}
 	
 	private void loadColorMap() {
 		colorMap = new HashMap<RGB, Color>();
-		File colorMapFile = new File(COLOR_MAP_PATH);
+		File colorMapFile = new File(COLORMAP_PATH);
 		try {
 			Scanner scanner = new Scanner(colorMapFile);
 			String line;
@@ -202,7 +209,12 @@ public class ImageProcessor {
 				orbStartY = r * orbWidth + startY;
 				captureStartX = orbStartX + offset;
 				captureStartY = orbStartY + offset;
-				rgb = boardImage.getRGB(captureStartX, captureStartY, captureWidth, captureWidth, null, 0, captureWidth);
+				rgb = boardImage.getRGB(
+						captureStartX, 
+						captureStartY, 
+						captureWidth, 
+						captureWidth, 
+						null, 0, captureWidth);
 				int[] reds = extractColor(rgb, 16);
 				int[] greens = extractColor(rgb, 8);
 				int[] blues = extractColor(rgb, 0);

@@ -30,7 +30,6 @@ public class BoardInputPanel extends JPanel implements ActionListener {
 	private static final int FONT_SIZE = 16;
 	
 	private static final String BOARDS_DIR = "./boards/";
-	private static final String COLOR_MAP_DIR = "./resources/colormaps/";
 	private static final String SCREEN_CAPTURE_CONFIGS_DIR = "./configurations/screen-capture-configurations.cfg";
 	private static final String OFFSET_X_KEY = "offsetx";
 	private static final String OFFSET_Y_KEY = "offsety";
@@ -105,14 +104,14 @@ public class BoardInputPanel extends JPanel implements ActionListener {
 			} else {
 				displayMessage("Failed to select image file");
 			}
-			ImageProcessor imageProcessor = new ImageProcessor(COLOR_MAP_DIR);
+			ImageProcessor imageProcessor = new ImageProcessor();
 			String boardAsString = imageProcessor.convertImage(boardImageFile);
 			boardText.setText(boardAsString);
 			board = new Board(boardAsString.split(""));
 			boardDisplayPanel.drawBoard(boardAsString);
 			Configurations.setBoard(board);
 		} else if (e.getSource() == captureButton) {
-			ImageProcessor imageProcessor = new ImageProcessor(COLOR_MAP_DIR);
+			ImageProcessor imageProcessor = new ImageProcessor();
 			String boardAsString = imageProcessor.convertImage(createScreenCaptureArea());
 			boardText.setText(boardAsString);
 			board = new Board(boardAsString.split(""));
