@@ -165,6 +165,9 @@ public class BoardEvaluator {
 			colorsToMatch.add(Color.B);
 			colorsToMatch.add(Color.L);
 			colorsToMatch.add(Color.D);
+			colorsToMatch.add(Color.H);
+			colorsToMatch.add(Color.J);
+			colorsToMatch.add(Color.P);
 		}
 		for (Color color : colorsToMatch) {
 			int dist = findThreeClosestOrbs(board, color);

@@ -4,14 +4,12 @@ import game.Board;
 import game.Color;
 import game.Move;
 
-import java.awt.Point;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
-import java.util.Random;
 import java.util.Set;
 
 import util.MovesetExecutor;
@@ -53,26 +51,6 @@ public class Agent {
 				}
 			}
 		}
-		
-//		int numCursorOrbsToTry = Configurations.getNumCursorOrbsToTry();
-//		if (numCursorOrbsToTry == numRows * numCols) {
-//			for (int r = 0; r < numRows; r++) {
-//				for (int c = 0; c < numCols; c++) {
-//					newBoard = new Board(board);
-//					newBoard.setCursor(r, c);
-//					data = new BoardData(newBoard, -1.0, new ArrayList<Move>());
-//					queue.add(data);
-//				}
-//			}
-//		} else {
-//			List<Point> randomCoordinates = getRandomCoordinates(numCursorOrbsToTry);
-//			for (Point p : randomCoordinates) {
-//				newBoard = new Board(board);
-//				newBoard.setCursor(p.x, p.y);
-//				data = new BoardData(newBoard, -1.0, new ArrayList<Move>());
-//				queue.add(data);
-//			}
-//		}
 		
 		// kick off threads
 		this.doWork = true;
@@ -138,24 +116,6 @@ public class Agent {
 
 	public void setTime(long time) {
 		this.time = time;
-	}
-	
-	private List<Point> getRandomCoordinates(int numCoordinates) {
-		List<Point> randomCoordinates = new ArrayList<Point>();
-		
-		for (int r = 0; r < Board.NUM_ROWS; r++) {
-			for (int c = 0; c < Board.NUM_COLS; c++) {
-				randomCoordinates.add(new Point(r, c));
-			}
-		}
-		
-		Random rng = new Random();
-		while (randomCoordinates.size() > numCoordinates) {
-			int removeIndex = rng.nextInt(randomCoordinates.size());
-			randomCoordinates.remove(removeIndex);
-		}
-		
-		return randomCoordinates;
 	}
 	
 	public static List<Move> appendMoveset(List<Move> moveset, Move newMove) {
