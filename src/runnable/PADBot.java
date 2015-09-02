@@ -21,7 +21,9 @@ public class PADBot {
 		mainFrame.add(mainPanel);
 		
 		mainFrame.pack();
-		mainFrame.setLocation((SCREEN_WIDTH - mainFrame.getWidth()) / 2, (SCREEN_HEIGHT - mainFrame.getHeight()) / 2);
+		mainFrame.setLocation(
+				(SCREEN_WIDTH - mainFrame.getWidth()) * 2 / 3, 
+				(SCREEN_HEIGHT - mainFrame.getHeight()) / 2);
 		mainFrame.setVisible(true);
 	}
 

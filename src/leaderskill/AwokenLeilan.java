@@ -6,6 +6,8 @@ import game.Match;
 import java.util.HashSet;
 import java.util.Set;
 
+import ai.Configurations;
+
 public class AwokenLeilan implements LeaderSkill {
 
 	private static final double MULTIPLIER = 3.5;
@@ -22,6 +24,9 @@ public class AwokenLeilan implements LeaderSkill {
 	public double getMultiplier(Set<Match> matches, Color color) {
 		if (color.equals(Color.H)) return 1.0;
 		
+		String board = Configurations.getBoard().toCode();
+		boolean rowRequired = (board.length() - board.replace("R", "").length() >= 10);
+		
 		int rowEnhanced = 0;
 		Set<Color> colorsMatched = new HashSet<Color>();
 		for (Match match : matches) {
@@ -31,7 +36,12 @@ public class AwokenLeilan implements LeaderSkill {
 			if (Color.R.equals(c) && match.isRow())
 				rowEnhanced++;
 		}
-		return (colorsMatched.size() >= NUM_COLORS_TO_MATCH) ? MULTIPLIER * rowEnhanced : 1.0;
+		if (colorsMatched.size() < NUM_COLORS_TO_MATCH)
+			return 1.0;
+		else if (rowRequired && rowEnhanced == 0)
+			return 1.0;
+		else
+			return MULTIPLIER * (1 + rowEnhanced);
 	}
 
 	@Override

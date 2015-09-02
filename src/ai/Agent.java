@@ -40,7 +40,7 @@ public class Agent {
 		Board newBoard;
 		
 		// initialize work queue
-		Set<Color> bestCursorColors = boardEvaluator.predictBestCursorColors(board);
+		List<Color> bestCursorColors = boardEvaluator.predictBestCursorColors(board);
 		for (int r = 0; r < numRows; r++) {
 			for (int c = 0; c < numCols; c++) {
 				if (bestCursorColors.contains(board.get(r, c).getColor())) {
