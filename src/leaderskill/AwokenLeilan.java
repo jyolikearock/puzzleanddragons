@@ -25,7 +25,7 @@ public class AwokenLeilan implements LeaderSkill {
 		if (color.equals(Color.H)) return 1.0;
 		
 		String board = Configurations.getBoard().toCode();
-		boolean rowRequired = (board.length() - board.replace("R", "").length() >= 10);
+		boolean rowRequired = (board.length() - board.replace("R", "").length() >= 12);
 		
 		int rowEnhanced = 0;
 		Set<Color> colorsMatched = new HashSet<Color>();
@@ -41,7 +41,7 @@ public class AwokenLeilan implements LeaderSkill {
 		else if (rowRequired && rowEnhanced == 0)
 			return 1.0;
 		else
-			return MULTIPLIER * (1 + rowEnhanced);
+			return MULTIPLIER * (1 + 0.5 * rowEnhanced);
 	}
 
 	@Override
