@@ -120,7 +120,18 @@ public class BoardEvaluator {
 	
 	public String getDamageReport() {
 		StringBuilder builder = new StringBuilder();
-		builder.append("Matches made\n");
+		builder.append("Multiplier:");
+		double multiplier = 1.0;
+		for (Color c : Color.values()) {
+			multiplier = Math.max(multiplier, leaderSkill1.getMultiplier(allMatches, c));
+		}
+		builder.append("\nLeader 1: " + multiplier);
+		multiplier = 1.0;
+		for (Color c : Color.values()) {
+			multiplier = Math.max(multiplier, leaderSkill2.getMultiplier(allMatches, c));
+		}
+		builder.append("\nLeader 2: " + multiplier);
+		builder.append("\n\n");
 		for (Match match : allMatches) {
 			builder.append(String.format("%s\n", match));
 		}
@@ -159,8 +170,8 @@ public class BoardEvaluator {
 		
 		int maxDist = -1;
 		Set<Color> colorsToMatch = leaderSkill1.getRequiredColors();
-		colorsToMatch.addAll(leaderSkill2.getRequiredColors());
-		if (colorsToMatch == null || colorsToMatch.isEmpty()) {
+//		colorsToMatch.addAll(leaderSkill2.getRequiredColors());
+//		if (colorsToMatch == null || colorsToMatch.isEmpty()) {
 			colorsToMatch.add(Color.R);
 			colorsToMatch.add(Color.G);
 			colorsToMatch.add(Color.B);
@@ -169,7 +180,7 @@ public class BoardEvaluator {
 			colorsToMatch.add(Color.H);
 			colorsToMatch.add(Color.J);
 			colorsToMatch.add(Color.P);
-		}
+//		}
 		for (Color color : colorsToMatch) {
 			int dist = findThreeClosestOrbs(board, color);
 			if (bestColors.size() < 2) {

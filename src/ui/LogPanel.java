@@ -15,7 +15,7 @@ public class LogPanel extends JPanel {
 	
 	private static final int ORB_WIDTH = 100;
 	private static final int TOTAL_WIDTH = ORB_WIDTH * (Board.NUM_COLS + 2);
-	private static final int HEIGHT = ORB_WIDTH * Board.NUM_COLS / 2;
+	private static final int HEIGHT = ORB_WIDTH * Board.NUM_COLS * 5 / 8;
 	
 	private JTextArea damageReport;
 	private JTextArea moveset;

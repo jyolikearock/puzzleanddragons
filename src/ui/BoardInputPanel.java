@@ -37,7 +37,7 @@ public class BoardInputPanel extends JPanel implements ActionListener {
 	private static final String HEIGHT_KEY = "height";
 
 	JTextArea boardText;
-	JButton convertButton, browseButton, captureButton;
+	JButton convertButton, browseButton, captureButton, randomButton;
 	Board board;
 	
 	public BoardInputPanel() {
@@ -58,16 +58,20 @@ public class BoardInputPanel extends JPanel implements ActionListener {
 		convertButton = new JButton("Convert");
 		browseButton = new JButton("Browse");
 		captureButton = new JButton("Screen Cap");
+		randomButton = new JButton("Random Board");
 		
 		convertButton.addActionListener(this);
 		browseButton.addActionListener(this);
 		captureButton.addActionListener(this);
+		randomButton.addActionListener(this);
 		
 		buttonsPanel.add(convertButton);
 		buttonsPanel.add(Box.createRigidArea(new Dimension(0, 10)));
 		buttonsPanel.add(browseButton);
 		buttonsPanel.add(Box.createRigidArea(new Dimension(0, 10)));
 		buttonsPanel.add(captureButton);
+		buttonsPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+		buttonsPanel.add(randomButton);
 		
 		add(boardText);
 		add(buttonsPanel);
@@ -78,9 +82,9 @@ public class BoardInputPanel extends JPanel implements ActionListener {
 	}
 
 	@Override
-	public void actionPerformed(ActionEvent e) {
+	public void actionPerformed(ActionEvent actionEvent) {
 		BoardDisplayPanel boardDisplayPanel = UIMaster.getBoardDisplayPanel();
-		if (e.getSource() == convertButton) {
+		if (actionEvent.getSource() == convertButton) {
 			String input = boardText.getText();
 			if (input == null || input.isEmpty()) {
 				displayMessage("Couldn't generate board because input was empty");
@@ -92,7 +96,7 @@ public class BoardInputPanel extends JPanel implements ActionListener {
 				boardDisplayPanel.drawBoard(input);
 				Configurations.setBoard(board);
 			}
-		} else if (e.getSource() == browseButton) {
+		} else if (actionEvent.getSource() == browseButton) {
 			File boardImageFile = null;
 			JFileChooser chooser = new JFileChooser(BOARDS_DIR);
 			FileNameExtensionFilter filter = new FileNameExtensionFilter("Image files", "jpg", "jpeg", "png", "bmp", "gif");
@@ -110,7 +114,7 @@ public class BoardInputPanel extends JPanel implements ActionListener {
 			board = new Board(boardAsString.split(""));
 			boardDisplayPanel.drawBoard(boardAsString);
 			Configurations.setBoard(board);
-		} else if (e.getSource() == captureButton) {
+		} else if (actionEvent.getSource() == captureButton) {
 			ImageProcessor imageProcessor = new ImageProcessor();
 			String boardAsString = imageProcessor.convertImage(createScreenCaptureArea());
 			boardText.setText(boardAsString);
@@ -121,6 +125,12 @@ public class BoardInputPanel extends JPanel implements ActionListener {
 			MainPanel mainPanel = UIMaster.getMainPanel();
 			ActionEvent action = new ActionEvent(mainPanel.getSolveButton(), ActionEvent.ACTION_FIRST, "solve");
 			mainPanel.actionPerformed(action);
+		} else if (actionEvent.getSource() == randomButton) {
+			board = new Board();
+			board.fill(6);
+			boardText.setText(board.toCode());
+			boardDisplayPanel.drawBoard(board.toCode());
+			Configurations.setBoard(board);
 		}
 	}
 	
