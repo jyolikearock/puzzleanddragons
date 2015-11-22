@@ -8,26 +8,26 @@ import java.util.Set;
 
 public class Krishna implements LeaderSkill {
 
-	private static final double MULTIPLIER = 3.0;
-	
-	@Override
-	public double getMultiplier(Set<Match> matches, Color color) {
-		if (color.equals(Color.H)) return 1.0;
-		int numRedMatches = 0;
-		for (Match match : matches) {
-			Color c = match.getColor();
-			if (c.equals(Color.R)) numRedMatches++;
-		}
-		if (numRedMatches == 2) return MULTIPLIER;
-		if (numRedMatches >= 3) return MULTIPLIER + 1.5;
-		else return 1.0;
-	}
+    private static final double MULTIPLIER = 3.0;
+    
+    @Override
+    public double getMultiplier(Set<Match> matches, Color color) {
+        if (color.equals(Color.H)) return 1.0;
+        int numRedMatches = 0;
+        for (Match match : matches) {
+            Color c = match.getColor();
+            if (c.equals(Color.R)) numRedMatches++;
+        }
+        if (numRedMatches == 2) return MULTIPLIER;
+        if (numRedMatches >= 3) return MULTIPLIER + 1.5;
+        else return 1.0;
+    }
 
-	@Override
-	public Set<Color> getRequiredColors() {
-		Set<Color> requiredColors = new HashSet<Color>();
-		requiredColors.add(Color.R);
-		return requiredColors;
-	}
+    @Override
+    public Set<Color> getRequiredColors() {
+        Set<Color> requiredColors = new HashSet<Color>();
+        requiredColors.add(Color.R);
+        return requiredColors;
+    }
 
 }

@@ -8,17 +8,17 @@ import java.util.Set;
 
 public class Unconditional30 implements LeaderSkill {
 
-	private static final double MULTIPLIER = 3.0;
-	
-	@Override
-	public double getMultiplier(Set<Match> matches, Color color) {
-		if (color.equals(Color.H)) return 1.0;
-		return MULTIPLIER;
-	}
+    private static final double MULTIPLIER = 3.0;
+    
+    @Override
+    public double getMultiplier(Set<Match> matches, Color color) {
+        if (color.equals(Color.H)) return 1.0;
+        return MULTIPLIER;
+    }
 
-	@Override
-	public Set<Color> getRequiredColors() {
-		return new HashSet<Color>();
-	}
+    @Override
+    public Set<Color> getRequiredColors() {
+        return new HashSet<Color>();
+    }
 
 }
