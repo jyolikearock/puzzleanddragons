@@ -21,6 +21,7 @@ public class BoardEvaluator {
 
     private Set<Match> matches;
     private Set<Match> allMatches;
+    private int numCascades;
     private Map<Color, Double> damageReport;
     private MatchFinder matchFinder;
 
@@ -32,19 +33,21 @@ public class BoardEvaluator {
 
     public double evaluate(Board board) {
         allMatches = getAllMatches(board);
-        return evaluateMatches(allMatches);
+        return evaluateMatches(allMatches) * Math.pow(10, numCascades);
     }
 
     private Set<Match> getAllMatches(Board board) {
         Set<Match> allMatches = new LinkedHashSet<Match>();
 
         Board boardCopy = new Board(board);
+        numCascades = 0;
         while ((matches = matchFinder.findMatches(boardCopy)).size() != 0) {
             for (Match match : matches) {
                 allMatches.add(match);
             }
             boardCopy.clear(matches);
             boardCopy.fall();
+            numCascades++;
         }
 
         return allMatches;
@@ -138,13 +141,17 @@ public class BoardEvaluator {
             multiplier = Math.max(multiplier, leaderSkill2.getMultiplier(allMatches, c));
         }
         builder.append("\nLeader 2: " + multiplier);
-        builder.append("\n\n");
+        builder.append("\n");
+        builder.append("\nCombos: " + allMatches.size());
+        builder.append("\nCascades: " + numCascades);
+        builder.append("\n");
         for (Match match : allMatches) {
-            builder.append(String.format("%s\n", match));
+            builder.append(String.format("\n%s", match));
         }
-        builder.append("\nTotal damage\n");
+        builder.append("\n");
+        builder.append("\nTotal damage");
         for (Color color : damageReport.keySet()) {
-            builder.append(String.format("%s: %.2f\n", color, damageReport.get(color)));
+            builder.append(String.format("\n%s: %.2f", color, damageReport.get(color)));
         }
         return builder.toString();
     }
