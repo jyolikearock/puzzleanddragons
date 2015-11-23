@@ -21,6 +21,7 @@ public class BoardEvaluator {
 
     private Set<Match> matches;
     private Set<Match> allMatches;
+    private double maxMultiplier1, maxMultiplier2;
     private int numCascades;
     private Map<Color, Double> damageReport;
     private MatchFinder matchFinder;
@@ -33,7 +34,10 @@ public class BoardEvaluator {
 
     public double evaluate(Board board) {
         allMatches = getAllMatches(board);
-        return evaluateMatches(allMatches) * Math.pow(10, numCascades);
+        return
+                evaluateMatches(allMatches)
+                + 1000000000 * (maxMultiplier1 + maxMultiplier2)
+                + 1000000 * numCascades;
     }
 
     private Set<Match> getAllMatches(Board board) {
@@ -98,9 +102,13 @@ public class BoardEvaluator {
 
         double totalScore = 0.0;
         double multiplier1, multiplier2;
+        maxMultiplier1 = 0.0;
+        maxMultiplier2 = 0.0;
         for (Color key : damageReport.keySet()) {
             multiplier1 = leaderSkill1.getMultiplier(matches, key);
             multiplier2 = leaderSkill2.getMultiplier(matches, key);
+            maxMultiplier1 = Math.max(multiplier1, maxMultiplier1);
+            maxMultiplier2 = Math.max(multiplier2, maxMultiplier2);
             double colorScore = damageReport.get(key).doubleValue();
             colorScore *= multiplier1 * multiplier2 * (1 + 0.25 * (combos - 1));
             damageReport.put(key, new Double(colorScore));
