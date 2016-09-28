@@ -26,9 +26,9 @@ import ai.Configurations;
 
 @SuppressWarnings("serial")
 public class BoardInputPanel extends JPanel implements ActionListener {
-    
+
     private static final int FONT_SIZE = 16;
-    
+
     private static final String BOARDS_DIR = "./boards/";
     private static final String SCREEN_CAPTURE_CONFIGS_DIR = "./configurations/screen-capture-configurations.cfg";
     private static final String OFFSET_X_KEY = "offsetx";
@@ -39,19 +39,19 @@ public class BoardInputPanel extends JPanel implements ActionListener {
     JTextArea boardText;
     JButton convertButton, browseButton, captureButton, randomButton;
     Board board;
-    
+
     public BoardInputPanel() {
         super();
         UIMaster.setBoardInputPanel(this);
         board = Configurations.getBoard();
-        
+
         boardText = new JTextArea();
         boardText.setFont(new Font("monospaced", Font.PLAIN, FONT_SIZE));
         boardText.setLineWrap(true);
         boardText.setWrapStyleWord(false);
         boardText.setPreferredSize(new Dimension(Board.NUM_COLS * FONT_SIZE * 2 / 3, Board.NUM_ROWS * FONT_SIZE * 4 / 3));
         boardText.setText(board.toCode());
-        
+
         JPanel buttonsPanel = new JPanel();
         BoxLayout layout = new BoxLayout(buttonsPanel,BoxLayout.Y_AXIS);
         buttonsPanel.setLayout(layout);
@@ -59,12 +59,12 @@ public class BoardInputPanel extends JPanel implements ActionListener {
         browseButton = new JButton("Browse");
         captureButton = new JButton("Screen Cap");
         randomButton = new JButton("Random Board");
-        
+
         convertButton.addActionListener(this);
         browseButton.addActionListener(this);
         captureButton.addActionListener(this);
         randomButton.addActionListener(this);
-        
+
         buttonsPanel.add(convertButton);
         buttonsPanel.add(Box.createRigidArea(new Dimension(0, 10)));
         buttonsPanel.add(browseButton);
@@ -72,11 +72,11 @@ public class BoardInputPanel extends JPanel implements ActionListener {
         buttonsPanel.add(captureButton);
         buttonsPanel.add(Box.createRigidArea(new Dimension(0, 10)));
         buttonsPanel.add(randomButton);
-        
+
         add(boardText);
         add(buttonsPanel);
     }
-    
+
     public Board getBoard() {
         return new Board(boardText.getText().split(""));
     }
@@ -121,7 +121,7 @@ public class BoardInputPanel extends JPanel implements ActionListener {
             board = new Board(boardAsString.split(""));
             boardDisplayPanel.drawBoard(boardAsString);
             Configurations.setBoard(board);
-            
+
             MainPanel mainPanel = UIMaster.getMainPanel();
             ActionEvent action = new ActionEvent(mainPanel.getSolveButton(), ActionEvent.ACTION_FIRST, "solve");
             mainPanel.actionPerformed(action);
@@ -133,7 +133,7 @@ public class BoardInputPanel extends JPanel implements ActionListener {
             Configurations.setBoard(board);
         }
     }
-    
+
     private Rectangle createScreenCaptureArea() {
         try {
             Scanner scanner = new Scanner(new File(SCREEN_CAPTURE_CONFIGS_DIR));
@@ -157,9 +157,9 @@ public class BoardInputPanel extends JPanel implements ActionListener {
             e.printStackTrace();
             return null;
         }
-        
+
     }
-    
+
     private void displayMessage(String message) {
         JOptionPane.showMessageDialog(null, message);
     }

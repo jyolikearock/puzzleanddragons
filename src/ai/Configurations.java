@@ -21,6 +21,7 @@ public class Configurations {
     public static final String ROW_REQUIRED_KEY = "RR";
     public static final String MIN_COMBO_KEY = "mincombo";
     public static final String BOARD_KEY = "board";
+    public static final int MEANINGFUL_NUMBER_OF_MOVES = 7;
 
     // effectively constants, but can be configured
     private static int numThreads = 8;
@@ -122,6 +123,9 @@ public class Configurations {
                 else teamInfo.put(split[0], split[1]);
             }
             scanner.close();
+
+            if (getMinCombos() > 0)
+                timeLimitMillis = Math.max(timeLimitMillis, 1000 * getMinCombos());
         } catch (FileNotFoundException e) {
             e.printStackTrace();
             return;

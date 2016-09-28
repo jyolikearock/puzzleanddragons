@@ -37,7 +37,8 @@ public class BoardEvaluator {
         return
                 evaluateMatches(allMatches)
                 + 1000000000 * (maxMultiplier1 + maxMultiplier2)
-                + 1000000 * numCascades;
+                + 1000000 * numCascades
+                + 1000000 * allMatches.size();
     }
 
     private Set<Match> getAllMatches(Board board) {
@@ -59,7 +60,9 @@ public class BoardEvaluator {
 
     private double evaluateMatches(Set<Match> matches) {
         damageReport = new HashMap<Color, Double>();
-        if (matches.size() < Configurations.getMinCombos()) return 0.0;
+        if (matches.size() < Configurations.getMinCombos()) {
+            return 0.0;
+        }
 
         Map<Color, Integer> rowEnhances = new HashMap<Color, Integer>();
         Color color;
@@ -207,6 +210,13 @@ public class BoardEvaluator {
         return bestColors;
     }
 
+    /**
+     * Finds the minimum number of moves required to get 3 orbs of the same color within
+     * proximity of each other
+     * @param board The board in question
+     * @param color The color to calculate the distance for
+     * @return The minimum number of moves
+     */
     public int findThreeClosestOrbs(Board board, Color color) {
         int secondClosestDist = Board.NUM_COLS;
 
@@ -235,5 +245,13 @@ public class BoardEvaluator {
         }
 
         return secondClosestDist == Board.NUM_COLS ? -1 : secondClosestDist;
+    }
+
+    public double calculateEntropy(Board board) {
+        int entropy = 0;
+        for (Color color : Color.values()) {
+            entropy += Math.max(0, findThreeClosestOrbs(board, color));
+        }
+        return entropy / 6.0;
     }
 }
